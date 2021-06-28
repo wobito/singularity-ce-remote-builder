@@ -1,6 +1,7 @@
 {
   "name": "singularity-ce-remote-builder",
   "publisher": "adrianwobito",
+  "repository": "https://github.com/wobito/singularity-ce-remote-builder",
   "displayName": "SingularityCE Remote Builder",
   "description": "",
   "version": "0.0.1",
@@ -51,46 +52,46 @@
     "menus": {
       "view/title": [
         {
-          "command": "remote-builder.refreshBuilds",
+          "command": "remoteBuilderExt.refreshBuilds",
           "when": "view == remoteBuilds",
           "group": "navigation"
         }
       ],
       "view/item/context": [
         {
-          "command": "remote-builder.viewOutput",
+          "command": "remoteBuilderExt.viewOutput",
           "when": "view == remoteBuilds && viewItem == build",
           "group": "inline"
         },
         {
-          "command": "remote-builder.deleteBuild",
+          "command": "remoteBuilderExt.deleteBuild",
           "when": "view == remoteBuilds && viewItem == build"
         },
         {
-          "command": "remote-builder.goToImage",
+          "command": "remoteBuilderExt.goToImage",
           "when": "view == remoteBuilds && viewItem == build"
         },
         {
-          "command": "remote-builder.viewOutput",
+          "command": "remoteBuilderExt.viewOutput",
           "when": "view == remoteBuilds && viewItem == build"
         },
         {
-          "command": "remote-builder.pullImage",
-          "when": "view == remoteBuilds && viewItem == build && remote-builder.hasSingularity"
+          "command": "remoteBuilderExt.pullImage",
+          "when": "view == remoteBuilds && viewItem == build && remoteBuilderExt.hasSingularity"
         }
       ]
     },
     "commands": [
       {
-        "command": "remote-builder.validateDef",
+        "command": "remoteBuilderExt.validateDef",
         "title": "Singularity: Validate DEF File"
       },
       {
-        "command": "remote-builder.submitBuild",
+        "command": "remoteBuilderExt.submitBuild",
         "title": "Singularity: Submit Build"
       },
       {
-        "command": "remote-builder.refreshBuilds",
+        "command": "remoteBuilderExt.refreshBuilds",
         "title": "Refresh",
         "icon": {
           "dark": "images/dark/refresh.svg",
@@ -98,11 +99,11 @@
         }
       },
       {
-        "command": "remote-builder.viewBuild",
+        "command": "remoteBuilderExt.viewBuild",
         "title": "View Build"
       },
       {
-        "command": "remote-builder.viewOutput",
+        "command": "remoteBuilderExt.viewOutput",
         "title": "View Output",
         "icon": {
           "dark": "images/dark/output.svg",
@@ -110,26 +111,26 @@
         }
       },
       {
-        "command": "remote-builder.deleteBuild",
+        "command": "remoteBuilderExt.deleteBuild",
         "title": "Delete Build"
       },
       {
-        "command": "remote-builder.goToImage",
+        "command": "remoteBuilderExt.goToImage",
         "title": "Go To Library Image"
       },
       {
-        "command": "remote-builder.pullImage",
+        "command": "remoteBuilderExt.pullImage",
         "title": "Pull Image"
       }
     ],
     "keybindings": [
       {
-        "command": "remote-builder.submitBuild",
+        "command": "remoteBuilderExt.submitBuild",
         "key": "ctrl+shift+alt+b",
         "mac": "cmd+shift+alt+b"
       },
       {
-        "command": "remote-builder.validateDef",
+        "command": "remoteBuilderExt.validateDef",
         "key": "ctrl+shift+alt+v",
         "mac": "cmd+shift+alt+v"
       }

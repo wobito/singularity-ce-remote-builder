@@ -20,7 +20,7 @@ export class RemoteBuildService {
   async askLibraryRef() {
     const result = await window.showInputBox({
       value: "",
-      valueSelection: [2, 4],
+      valueSelection: [0, 0],
       placeHolder: "For example: entity/collection/container:tag",
     });
     return result;

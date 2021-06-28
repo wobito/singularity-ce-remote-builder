@@ -13,47 +13,40 @@ export async function activate(context: vscode.ExtensionContext) {
   const tdp = new TextDocumentProvider();
   const rb = new RemoteBuildService(rbp, tdp);
 
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "remote-builder.validateDef",
-      rb.validateDef
-    )
-  );
-  context.subscriptions.push(
-    vscode.commands.registerCommand(
-      "remote-builder.submitBuild",
-      rb.submitBuild
-    )
-  );
-  context.subscriptions.push(
-    vscode.workspace.registerTextDocumentContentProvider("singularity", tdp)
-  );
-
-  vscode.commands.registerCommand("remote-builder.refreshBuilds", () =>
+  vscode.commands.registerCommand("remoteBuilderExt.refreshBuilds", () =>
     rbp.refresh()
   );
-  vscode.commands.registerCommand("remote-builder.goToImage", (build) =>
-    rb.goToLibraryImage(build)
+  vscode.commands.registerCommand("remoteBuilderExt.goToImage", (build) => {
+    rb.goToLibraryImage(build);
+  });
+  vscode.commands.registerCommand(
+    "remoteBuilderExt.viewBuild",
+    async (build) => {
+      rb.viewBuildDef(build);
+    }
   );
-  vscode.commands.registerCommand("remote-builder.viewBuild", async (build) =>
-    rb.viewBuildDef(build)
+  vscode.commands.registerCommand(
+    "remoteBuilderExt.viewOutput",
+    async (build) => {
+      rb.viewBuildOutput(build);
+    }
   );
-  vscode.commands.registerCommand("remote-builder.viewOutput", async (build) =>
-    rb.viewBuildOutput(build)
-  );
-  vscode.commands.registerCommand("remote-builder.deleteBuild", async (build) =>
-    rb.deleteBuild(build)
+  vscode.commands.registerCommand(
+    "remoteBuilderExt.deleteBuild",
+    async (build) => {
+      rb.deleteBuild(build);
+    }
   );
 
   exec(`which singularity`, (code) => {
     if (code == 0) {
       vscode.commands.executeCommand(
         "setContext",
-        "remote-builder.hasSingularity",
+        "remoteBuilderExt.hasSingularity",
         true
       );
       vscode.commands.registerCommand(
-        "remote-builder.pullImage",
+        "remoteBuilderExt.pullImage",
         async (build) => {
           rb.pullImage(build);
         }
@@ -62,6 +55,20 @@ export async function activate(context: vscode.ExtensionContext) {
   });
 
   vscode.window.registerTreeDataProvider("remoteBuilds", rbp);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("remoteBuilderExt.validateDef", () => {
+      rb.validateDef();
+    })
+  );
+  context.subscriptions.push(
+    vscode.commands.registerCommand("remoteBuilderExt.submitBuild", () => {
+      rb.submitBuild();
+    })
+  );
+
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider("singularity", tdp)
+  );
 }
 
 // this method is called when your extension is deactivated
