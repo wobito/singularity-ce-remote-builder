@@ -1,0 +1,191 @@
+{
+  "name": "singularity-ce-remote-builder",
+  "publisher": "adrianwobito",
+  "displayName": "SingularityCE Remote Builder",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.56.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "*",
+    "onView:remoteBuilds"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "SingularityCE",
+      "properties": {
+        "singularityCE.APIToken": {
+          "type": "string",
+          "default": "",
+          "description": "API Token from the cloud services."
+        },
+        "singularityCE.cloudUrl": {
+          "type": "string",
+          "default": "https://cloud.sylabs.io",
+          "description": "Specifies the cloud url."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "singularity-builder",
+          "title": "SingularityCE Remote Builder",
+          "icon": "./images/singularity-logo.png"
+        }
+      ]
+    },
+    "views": {
+      "singularity-builder": [
+        {
+          "id": "remoteBuilds",
+          "name": "Remote Builds"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "remote-builder.refreshBuilds",
+          "when": "view == remoteBuilds",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "remote-builder.viewOutput",
+          "when": "view == remoteBuilds && viewItem == build",
+          "group": "inline"
+        },
+        {
+          "command": "remote-builder.deleteBuild",
+          "when": "view == remoteBuilds && viewItem == build"
+        },
+        {
+          "command": "remote-builder.goToImage",
+          "when": "view == remoteBuilds && viewItem == build"
+        },
+        {
+          "command": "remote-builder.viewOutput",
+          "when": "view == remoteBuilds && viewItem == build"
+        },
+        {
+          "command": "remote-builder.pullImage",
+          "when": "view == remoteBuilds && viewItem == build"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "remote-builder.validateDef",
+        "title": "Singularity: Validate DEF File"
+      },
+      {
+        "command": "remote-builder.submitBuild",
+        "title": "Singularity: Submit Build"
+      },
+      {
+        "command": "remote-builder.refreshBuilds",
+        "title": "Refresh",
+        "icon": {
+          "dark": "images/dark/refresh.svg",
+          "light": "images/light/refresh.svg"
+        }
+      },
+      {
+        "command": "remote-builder.viewBuild",
+        "title": "View Build"
+      },
+      {
+        "command": "remote-builder.viewOutput",
+        "title": "View Output",
+        "icon": {
+          "dark": "images/dark/output.svg",
+          "light": "images/light/output.svg"
+        }
+      },
+      {
+        "command": "remote-builder.deleteBuild",
+        "title": "Delete Build"
+      },
+      {
+        "command": "remote-builder.goToImage",
+        "title": "Go To Library Image"
+      },
+      {
+        "command": "remote-builder.pullImage",
+        "title": "Pull Image"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "remote-builder.submitBuild",
+        "key": "ctrl+shift+alt+b",
+        "mac": "cmd+shift+alt+b"
+      },
+      {
+        "command": "remote-builder.validateDef",
+        "key": "ctrl+shift+alt+v",
+        "mac": "cmd+shift+alt+v"
+      }
+    ],
+    "languages": [
+      {
+        "id": "singularity",
+        "aliases": [
+          "Singularity Definition File",
+          "singularity"
+        ],
+        "extensions": [
+          ".def"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "singularity",
+        "scopeName": "source.def",
+        "path": "./syntaxes/singularity.tmLanguage.json"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "lint": "eslint src --ext ts",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.3",
+    "@types/jsonwebtoken": "^8.5.1",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^12.11.7",
+    "@types/node-fetch": "^2.5.7",
+    "@types/shelljs": "^0.8.8",
+    "@types/vscode": "^1.56.0",
+    "@types/ws": "^7.4.4",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "eslint": "^7.9.0",
+    "glob": "^7.1.6",
+    "mocha": "^8.1.3",
+    "node-fetch": "^2.6.1",
+    "typescript": "^4.0.2",
+    "vscode-test": "^1.4.0"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dayjs": "^1.10.5",
+    "jsonwebtoken": "^8.5.1",
+    "shelljs": "^0.8.4",
+    "ws": "^7.4.5"
+  }
+}
