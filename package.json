@@ -65,19 +65,23 @@
         },
         {
           "command": "remoteBuilderExt.deleteBuild",
-          "when": "view == remoteBuilds && viewItem == build"
+          "when": "view == remoteBuilds && viewItem == build",
+          "group": "sifGroup_2@1"
         },
         {
           "command": "remoteBuilderExt.goToImage",
-          "when": "view == remoteBuilds && viewItem == build"
+          "when": "view == remoteBuilds && viewItem == build",
+          "group": "sifGroup_1@2"
         },
         {
           "command": "remoteBuilderExt.viewOutput",
-          "when": "view == remoteBuilds && viewItem == build"
+          "when": "view == remoteBuilds && viewItem == build",
+          "group": "sifGroup_1@3"
         },
         {
           "command": "remoteBuilderExt.pullImage",
-          "when": "view == remoteBuilds && viewItem == build && remoteBuilderExt.hasSingularity"
+          "when": "view == remoteBuilds && viewItem == build && remoteBuilderExt.hasSingularity",
+          "group": "sifGroup_1@1"
         }
       ]
     },
