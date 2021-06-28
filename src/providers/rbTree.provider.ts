@@ -51,7 +51,7 @@ class Build extends vscode.TreeItem {
     this.contextValue = "build";
 
     this.command = {
-      command: "remote-builder.viewBuild",
+      command: "remoteBuilderExt.viewBuild",
       arguments: [this],
       title: "View Build",
     };
