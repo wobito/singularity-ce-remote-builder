@@ -9,7 +9,7 @@ export let userData: any;
 
 workspace.onDidChangeConfiguration(async () => {
   singularityConfig = workspace.getConfiguration("singularityCE");
-  console.log(singularityConfig["cloudUrl"], singularityConfig["APIToken"]);
+
   await getConfig();
   await getUserData();
 });

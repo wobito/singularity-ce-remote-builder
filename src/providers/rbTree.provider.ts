@@ -58,8 +58,24 @@ class Build extends vscode.TreeItem {
   }
 
   iconPath = {
-    light: path.join(__filename, "..", "..", "images", "light", "build.svg"),
-    dark: path.join(__filename, "..", "..", "images", "dark", "build.svg"),
+    light: path.join(
+      __filename,
+      "..",
+      "..",
+      "..",
+      "images",
+      "light",
+      "build.svg"
+    ),
+    dark: path.join(
+      __filename,
+      "..",
+      "..",
+      "..",
+      "images",
+      "dark",
+      "build.svg"
+    ),
   };
 
   getLibRef() {

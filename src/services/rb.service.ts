@@ -7,6 +7,7 @@ import {workspace, Uri, window, ProgressLocation, env} from "vscode";
 
 import * as dayjs from "dayjs";
 import * as WebSocket from "ws";
+import * as shell from "shelljs";
 
 export class RemoteBuildService {
   rbp: RemoteBuildTreeProvider;
@@ -171,9 +172,51 @@ export class RemoteBuildService {
       .split(":")
       .slice(0, 1)
       .join("");
-    console.log(ref);
+
     env.openExternal(
       Uri.parse(`${singularityConfig["cloudUrl"]}/library/${ref}`)
     );
+  }
+
+  async pullImage(build: any) {
+    const result = await window.showInputBox({
+      value: `${shell.pwd()}/${
+        build.build.libraryRef.split("/").reverse()[0]
+      }.sif`,
+      valueSelection: [0, 0],
+      placeHolder: "SIF Destination, EG: /tmp/image.sif",
+    });
+    if (result) {
+      window.withProgress(
+        {
+          location: ProgressLocation.Notification,
+          title: "Pulling SIF....",
+        },
+        async (_, __) => {
+          const p = new Promise<void>((resolve) => {
+            const output = window.createOutputChannel("imagePull");
+            output.show();
+            output.append("Download Started\n");
+            const r = shell.exec(
+              `singularity pull -F ${result} ${build.build.libraryRef}`,
+              {async: true}
+            );
+
+            r.stderr?.on("data", (d: any) => {
+              output.append(d);
+            });
+            r.stderr?.on("close", () => {
+              window.showInformationMessage(
+                `Download Complete\nSIF located at ${result}`
+              );
+              output.append("\nDownload Complete");
+              output.append(`\nSIF located at ${result}`);
+              resolve();
+            });
+          });
+          return p;
+        }
+      );
+    }
   }
 }

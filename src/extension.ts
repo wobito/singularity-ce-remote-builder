@@ -4,9 +4,7 @@ import {getConfig, getUserData} from "./utils/config";
 import {RemoteBuildService} from "./services/rb.service";
 import {RemoteBuildTreeProvider} from "./providers/rbTree.provider";
 import {TextDocumentProvider} from "./providers/rbTextDocument.provider";
-
-import * as shell from "shelljs";
-
+import {exec} from "shelljs";
 export async function activate(context: vscode.ExtensionContext) {
   await getConfig();
   await getUserData();
@@ -46,9 +44,21 @@ export async function activate(context: vscode.ExtensionContext) {
   vscode.commands.registerCommand("remote-builder.deleteBuild", async (build) =>
     rb.deleteBuild(build)
   );
-  vscode.commands.registerCommand("remote-builder.pullImage", async (build) => {
-    console.log(build.build);
-    shell.exec(`singularity pull image.sif ${build.build.libraryRef}`);
+
+  exec(`which singularity`, (code) => {
+    if (code == 0) {
+      vscode.commands.executeCommand(
+        "setContext",
+        "remote-builder.hasSingularity",
+        true
+      );
+      vscode.commands.registerCommand(
+        "remote-builder.pullImage",
+        async (build) => {
+          rb.pullImage(build);
+        }
+      );
+    }
   });
 
   vscode.window.registerTreeDataProvider("remoteBuilds", rbp);

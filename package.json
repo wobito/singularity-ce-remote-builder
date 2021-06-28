@@ -76,7 +76,7 @@
         },
         {
           "command": "remote-builder.pullImage",
-          "when": "view == remoteBuilds && viewItem == build"
+          "when": "view == remoteBuilds && viewItem == build && remote-builder.hasSingularity"
         }
       ]
     },
@@ -182,6 +182,7 @@
     "vscode-test": "^1.4.0"
   },
   "dependencies": {
+    "ansi-to-html": "^0.6.15",
     "axios": "^0.21.1",
     "dayjs": "^1.10.5",
     "jsonwebtoken": "^8.5.1",
