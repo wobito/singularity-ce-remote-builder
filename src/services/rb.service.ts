@@ -82,6 +82,7 @@ export class RemoteBuildService {
                   window.showInformationMessage(
                     "Build Completed at " + completedAt
                   );
+                  this.rbp.refresh();
                   resolve();
                 };
               });
