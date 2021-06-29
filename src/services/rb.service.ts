@@ -8,6 +8,7 @@ import {workspace, Uri, window, ProgressLocation, env} from "vscode";
 import * as dayjs from "dayjs";
 import * as WebSocket from "ws";
 import * as shell from "shelljs";
+import {rejects} from "assert";
 
 export class RemoteBuildService {
   rbp: RemoteBuildTreeProvider;
@@ -180,18 +181,25 @@ export class RemoteBuildService {
   }
 
   async pullImage(build: any) {
-    const result = await window.showInputBox({
-      value: `${shell.pwd()}/${
-        build.build.libraryRef.split("/").reverse()[0]
-      }.sif`,
-      valueSelection: [0, 0],
-      placeHolder: "SIF Destination, EG: /tmp/image.sif",
+    const filePath = await window.showSaveDialog({
+      title: "Please select a path to save the SIF",
+      saveLabel: "Pull SIF",
     });
-    if (result) {
+    if (filePath) {
+      if (!filePath.path.match(/\.sif/)) {
+        window.showErrorMessage("Filename must contain .sif extension");
+        return;
+      }
+      const fullSifPath = filePath.path;
+      const pullPath = filePath.path.split("/").slice(0, -1).join("/");
+      const sifName = filePath.path.split("/").splice(-1, 1)[0];
+
+      const terminal = window.createTerminal("pulledSIF");
+      terminal.sendText(`cd ${pullPath}`);
       window.withProgress(
         {
           location: ProgressLocation.Notification,
-          title: "Pulling SIF....",
+          title: `Pulling SIF as ${sifName}....`,
         },
         async (_, __) => {
           const p = new Promise<void>((resolve) => {
@@ -199,7 +207,7 @@ export class RemoteBuildService {
             output.show();
             output.append("Download Started\n");
             const r = shell.exec(
-              `singularity pull -F ${result} ${build.build.libraryRef}`,
+              `singularity pull -F ${fullSifPath} ${build.build.libraryRef}`,
               {async: true}
             );
 
@@ -208,10 +216,12 @@ export class RemoteBuildService {
             });
             r.stderr?.on("close", () => {
               window.showInformationMessage(
-                `Download Complete\nSIF located at ${result}`
+                `Download Complete\nSIF located at ${fullSifPath}`
               );
               output.append("\nDownload Complete");
-              output.append(`\nSIF located at ${result}`);
+              output.append(`\nSIF located at ${fullSifPath}`);
+
+              terminal.show();
               resolve();
             });
           });
