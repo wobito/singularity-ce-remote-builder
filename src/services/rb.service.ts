@@ -8,7 +8,7 @@ import {workspace, Uri, window, ProgressLocation, env} from "vscode";
 import * as dayjs from "dayjs";
 import * as WebSocket from "ws";
 import * as shell from "shelljs";
-import {rejects} from "assert";
+import {isEphemeral} from "../utils/helpers";
 
 export class RemoteBuildService {
   rbp: RemoteBuildTreeProvider;
@@ -169,6 +169,15 @@ export class RemoteBuildService {
   }
 
   goToLibraryImage(build: any) {
+    if (isEphemeral(build.build.libraryRef, build.build.completeTime)) {
+      window.showErrorMessage(
+        "Cannot open library reference, this remote build is ephemeral and was removed on " +
+          dayjs(build.build.completeTime)
+            .add(24, "hours")
+            .format("MMMM DD, YYYY")
+      );
+      return;
+    }
     const ref = build.build.libraryRef
       .replace(/library:\/\//, "")
       .split(":")

@@ -4,6 +4,7 @@ import * as path from "path";
 import {config, userData} from "../utils/config";
 
 import {http} from "../utils/http";
+import {isEphemeral} from "../utils/helpers";
 
 export class RemoteBuildTreeProvider implements vscode.TreeDataProvider<Build> {
   private _onDidChangeTreeData: vscode.EventEmitter<
@@ -45,10 +46,11 @@ class Build extends vscode.TreeItem {
     public readonly collapsibleState: vscode.TreeItemCollapsibleState
   ) {
     super(build.id, collapsibleState);
+    this.setContext();
     this.label = this.getLibRef();
     this.tooltip = this.getTooltip();
     this.description = this.getDescription();
-    this.contextValue = "build";
+    this.setIcon();
 
     this.command = {
       command: "remoteBuilderExt.viewBuild",
@@ -57,26 +59,40 @@ class Build extends vscode.TreeItem {
     };
   }
 
-  iconPath = {
-    light: path.join(
-      __filename,
-      "..",
-      "..",
-      "..",
-      "images",
-      "light",
-      "build.svg"
-    ),
-    dark: path.join(
-      __filename,
-      "..",
-      "..",
-      "..",
-      "images",
-      "dark",
-      "build.svg"
-    ),
-  };
+  setContext() {
+    this.contextValue = isEphemeral(
+      this.build.libraryRef,
+      this.build.completeTime
+    )
+      ? "ephemeralBuild"
+      : "build";
+  }
+
+  setIcon() {
+    const iconName =
+      this.contextValue === "ephemeralBuild" ? "build-ephemeral" : "build";
+
+    this.iconPath = {
+      light: path.join(
+        __filename,
+        "..",
+        "..",
+        "..",
+        "images",
+        "light",
+        `${iconName}.svg`
+      ),
+      dark: path.join(
+        __filename,
+        "..",
+        "..",
+        "..",
+        "images",
+        "dark",
+        `${iconName}.svg`
+      ),
+    };
+  }
 
   getLibRef() {
     return this.build.libraryRef.replace(/library:\/\//, "");

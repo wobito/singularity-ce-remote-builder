@@ -39,7 +39,7 @@ export async function activate(context: vscode.ExtensionContext) {
   );
 
   exec(`which singularity`, (code) => {
-    if (code == 0) {
+    if (code === 0) {
       vscode.commands.executeCommand(
         "setContext",
         "remoteBuilderExt.hasSingularity",
