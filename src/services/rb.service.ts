@@ -3,7 +3,7 @@ import {TextDocumentProvider} from "../providers/rbTextDocument.provider";
 
 import {config, getConfig, singularityConfig} from "../utils/config";
 import {http} from "../utils/http";
-import {workspace, Uri, window, ProgressLocation, env} from "vscode";
+import {workspace, Uri, window, ProgressLocation, env, Terminal} from "vscode";
 
 import * as dayjs from "dayjs";
 import * as WebSocket from "ws";
@@ -201,9 +201,12 @@ export class RemoteBuildService {
       const fullSifPath = filePath.path;
       const pullPath = filePath.path.split("/").slice(0, -1).join("/");
       const sifName = filePath.path.split("/").splice(-1, 1)[0];
-
-      const terminal = window.createTerminal("pulledSIF");
-      terminal.sendText(`cd ${pullPath}`);
+      let terminal: Terminal;
+      if (window.activeTerminal) {
+        terminal = window.activeTerminal;
+      } else {
+        terminal = window.createTerminal("pull-sif");
+      }
       window.withProgress(
         {
           location: ProgressLocation.Notification,
@@ -228,8 +231,16 @@ export class RemoteBuildService {
               );
               output.append("\nDownload Complete");
               output.append(`\nSIF located at ${fullSifPath}`);
+              output.append(`\nOpening A Terminal Window to: ${pullPath}`);
 
-              terminal.show();
+              setTimeout(() => {
+                new Promise<void>((resolve, _) => {
+                  terminal.show();
+                  resolve();
+                }).then(() => {
+                  terminal.sendText(`cd ${pullPath}`);
+                });
+              }, 2000);
               resolve();
             });
           });

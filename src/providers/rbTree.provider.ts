@@ -30,7 +30,8 @@ export class RemoteBuildTreeProvider implements vscode.TreeDataProvider<Build> {
         }
       });
     } catch (e) {
-      console.log(e.response);
+      vscode.window.showErrorMessage(e.response);
+      console.error(e);
     }
     return Promise.resolve(arr);
   }
