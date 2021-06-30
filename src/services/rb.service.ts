@@ -106,12 +106,11 @@ export class RemoteBuildService {
     const config = await getConfig();
     const url = `${config.builderAPI.uri}/v1/convert-def-file`;
     const text = window.activeTextEditor?.document.getText();
+
     try {
       const response = await http.post(url, text);
       if (typeof response.data.error !== "undefined") {
-        window.showErrorMessage(
-          "DEF File Invalid: " + response.data.error.message
-        );
+        window.showErrorMessage("DEF File Invalid");
         return;
       }
 
@@ -121,7 +120,7 @@ export class RemoteBuildService {
       }
     } catch (e) {
       console.log(e);
-      window.showErrorMessage("DEF File Invalid: " + e);
+      window.showErrorMessage("DEF File Invalid");
     }
   }
 
