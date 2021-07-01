@@ -3,8 +3,9 @@
   "publisher": "adrianwobito",
   "repository": "https://github.com/wobito/singularity-ce-remote-builder",
   "displayName": "SingularityCE Remote Builder",
-  "description": "",
+  "description": "Provides direct access to the cloud.sylabs.io remote builder and light syntax highlighting for Singularity definition files",
   "version": "0.0.1",
+  "icon": "images/singularity-logo-sq.png",
   "engines": {
     "vscode": "^1.56.0"
   },
@@ -80,7 +81,7 @@
         },
         {
           "command": "remoteBuilderExt.pullImage",
-          "when": "view == remoteBuilds && viewItem == build || viewItem == ephemeralBuild && remoteBuilderExt.hasSingularity",
+          "when": "view == remoteBuilds && remoteBuilderExt.hasSingularity && viewItem == build",
           "group": "sifGroup_1@1"
         }
       ]
