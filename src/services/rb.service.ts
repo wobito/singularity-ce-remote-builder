@@ -1,14 +1,21 @@
-import {RemoteBuildTreeProvider} from "../providers/rbTree.provider";
-import {TextDocumentProvider} from "../providers/rbTextDocument.provider";
+import { RemoteBuildTreeProvider } from "../providers/rbTree.provider";
+import { TextDocumentProvider } from "../providers/rbTextDocument.provider";
 
-import {config, getConfig, singularityConfig} from "../utils/config";
-import {http} from "../utils/http";
-import {workspace, Uri, window, ProgressLocation, env, Terminal} from "vscode";
+import { config, getConfig, singularityConfig } from "../utils/config";
+import { http } from "../utils/http";
+import {
+  workspace,
+  Uri,
+  window,
+  ProgressLocation,
+  env,
+  Terminal,
+} from "vscode";
 
 import * as dayjs from "dayjs";
 import * as WebSocket from "ws";
 import * as shell from "shelljs";
-import {isEphemeral} from "../utils/helpers";
+import { isEphemeral } from "../utils/helpers";
 
 export class RemoteBuildService {
   rbp: RemoteBuildTreeProvider;
@@ -33,68 +40,88 @@ export class RemoteBuildService {
     const url = `${config.builderAPI.uri}/v1/build`;
     const text = window.activeTextEditor?.document.getText();
     const libraryRef = await this.askLibraryRef();
-    if (libraryRef) {
-      try {
-        window.withProgress(
-          {
-            location: ProgressLocation.Notification,
-            title: "Building SIF....",
-          },
-          async (_, __) => {
-            const r = await http.post(url, {
+    if (!defData) {
+      window.showErrorMessage("Build Failure: definition data is null");
+      return;
+    }
+
+    if (!text) {
+      window.showErrorMessage("Build Failure: build reciepe is null");
+      return;
+    }
+
+    if (!libraryRef) {
+      window.showErrorMessage("Build Failure: library refernce is invalid");
+      return;
+    }
+
+    try {
+      window.withProgress(
+        {
+          location: ProgressLocation.Notification,
+          title: "Building SIF....",
+        },
+        async (_, __) => {
+          const r = await http.post(
+            url,
+            {
               definition: defData,
-              buildReceipe: text,
+              buildRecipe: text,
               libraryRef: "library://" + libraryRef,
-            });
-
-            if (typeof r.data.error !== "undefined") {
-              window.showErrorMessage("Build Failure: " + r.data.error.message);
-              return;
+            },
+            {
+              headers: { "Content-Type": "application/json" },
             }
-            if (r.data) {
-              const p = new Promise<void>((resolve) => {
-                const output = window.createOutputChannel("buildOutput");
-                const socket = new WebSocket(
-                  r.data.data.wsURL +
-                    `?auth_token=${singularityConfig["APIToken"]}`
-                );
-                output.show();
-                socket.onopen = () => {
-                  output.clear();
-                };
-                socket.onmessage = (e: any) => {
-                  if (e.data !== "") {
-                    output.append(e.data);
-                  }
-                };
-                socket.onclose = async () => {
-                  const res = await http.get(`${url}/${r.data.data.id}`);
-                  const completedAt = dayjs(res.data.data.completeTime).format(
-                    "DD/MM/YYYY [at] HH:mm:ss"
-                  );
+          );
 
-                  output.appendLine("Build Completed at " + completedAt);
-                  output.appendLine(
-                    "Build Complete - View your built image at " +
-                      singularityConfig["cloudUrl"] +
-                      "/library/" +
-                      libraryRef
-                  );
-                  window.showInformationMessage(
-                    "Build Completed at " + completedAt
-                  );
-                  this.rbp.refresh();
-                  resolve();
-                };
-              });
-              return p;
-            }
+          if (typeof r.data.error !== "undefined") {
+            window.showErrorMessage("Build Failure: " + r.data.error.message);
+            return;
           }
-        );
-      } catch (e) {
-        console.log(e);
-        window.showErrorMessage("Build Failure: " + e);
-      }
+          if (r.data) {
+            console.log(r.data);
+            const p = new Promise<void>((resolve) => {
+              const output = window.createOutputChannel("buildOutput");
+              const socket = new WebSocket(
+                r.data.data.wsURL +
+                  `?auth_token=${singularityConfig["APIToken"]}`
+              );
+              output.show();
+              socket.onopen = () => {
+                output.clear();
+              };
+              socket.onmessage = (e: any) => {
+                if (e.data !== "") {
+                  output.append(e.data);
+                }
+              };
+              socket.onclose = async () => {
+                const res = await http.get(`${url}/${r.data.data.id}`);
+                const completedAt = dayjs(res.data.data.completeTime).format(
+                  "DD/MM/YYYY [at] HH:mm:ss"
+                );
+
+                output.appendLine("Build Completed at " + completedAt);
+                output.appendLine(
+                  "Build Complete - View your built image at " +
+                    singularityConfig["cloudUrl"] +
+                    "/library/" +
+                    libraryRef
+                );
+                window.showInformationMessage(
+                  "Build Completed at " + completedAt
+                );
+                this.rbp.refresh();
+                resolve();
+              };
+            });
+            return p;
+          }
+        }
+      );
+    } catch (e) {
+      console.log(e);
+      window.showErrorMessage("Build Failure: " + e);
     }
   }
 
@@ -108,7 +135,9 @@ export class RemoteBuildService {
     const text = window.activeTextEditor?.document.getText();
 
     try {
-      const response = await http.post(url, text);
+      const response = await http.post(url, text, {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      });
       if (typeof response.data.error !== "undefined") {
         window.showErrorMessage("DEF File Invalid");
         return;
@@ -149,7 +178,7 @@ export class RemoteBuildService {
 
       let uri = Uri.parse("singularity:" + file.slice(-1).pop() + ".def");
       let doc = await workspace.openTextDocument(uri);
-      await window.showTextDocument(doc, {preview: false});
+      await window.showTextDocument(doc, { preview: false });
     } else {
       window.showErrorMessage("No build recipe stored for this build");
     }
@@ -163,7 +192,7 @@ export class RemoteBuildService {
       this.tdp.setBodyText(resp.data);
       let uri = Uri.parse("singularity:" + build.build.id + "-output.log");
       let doc = await workspace.openTextDocument(uri);
-      await window.showTextDocument(doc, {preview: false});
+      await window.showTextDocument(doc, { preview: false });
     }
   }
 
@@ -219,7 +248,7 @@ export class RemoteBuildService {
             output.append("Download Started\n");
             const r = shell.exec(
               `singularity pull -F ${fullSifPath} ${build.build.libraryRef}`,
-              {async: true}
+              { async: true }
             );
 
             r.stderr?.on("data", (d: any) => {

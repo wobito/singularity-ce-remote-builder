@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import * as dayjs from "dayjs";
 import * as path from "path";
-import {config, userData} from "../utils/config";
+import { config, userData } from "../utils/config";
 
-import {http} from "../utils/http";
-import {isEphemeral} from "../utils/helpers";
+import { http } from "../utils/http";
+import { isEphemeral } from "../utils/helpers";
 
 export class RemoteBuildTreeProvider implements vscode.TreeDataProvider<Build> {
   private _onDidChangeTreeData: vscode.EventEmitter<
@@ -29,7 +29,7 @@ export class RemoteBuildTreeProvider implements vscode.TreeDataProvider<Build> {
           arr.push(item);
         }
       });
-    } catch (e) {
+    } catch (e: any) {
       vscode.window.showErrorMessage(e.response);
       console.error(e);
     }
