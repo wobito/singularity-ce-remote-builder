@@ -13,6 +13,9 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
+		"onLanguage:singularity",
+		"onCommand:remoteBuilderExt.validateDef",
+		"onCommand:remoteBuilderExt.submitBuild",
 		"onView:remoteBuilds"
 	],
 	"main": "./out/extension.js",
