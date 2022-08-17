@@ -1,9 +1,14 @@
 # Change Log
 
-All notable changes to the "singularity-def-file" extension will be documented in this file.
+All notable changes to this project will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [0.0.5] - 2022-08-17
 
-## [Unreleased]
+### Added
 
-- Initial release
+- Added GitHub actions Build/Publish CI.
+- Added `.def` icon type.
+
+### Fixed
+
+- Extensions activation events.
