@@ -1,0 +1,21 @@
+name: Tag Release
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build-source:
+    name: "Build Tag"
+    runs-on: ubuntu-latest
+    env:
+      VSCE_PAT: ${{ secrets.VSCE_PAT }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "18"
+          cache: "npm"
+      - run: npm install
+      - run: npm run package
+      - run: npm run publish
